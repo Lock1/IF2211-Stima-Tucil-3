@@ -1,0 +1,13 @@
+﻿<Application x:Class="Tubes2_App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Tubes2_App"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <Style x:Key="VigaFont">
+            <Setter Property="TextBlock.FontFamily" Value="/Fonts/#Viga">
+
+            </Setter>
+        </Style>
+    </Application.Resources>
+</Application>
