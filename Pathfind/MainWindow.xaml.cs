@@ -205,7 +205,7 @@ namespace Tubes2_App
                 string path = Environment.CurrentDirectory;
                 BitmapImage bi3 = new BitmapImage();
                 bi3.BeginInit();
-                bi3.UriSource = new Uri(@path + ("/graph-" + currentFilename + ".png"), UriKind.Absolute); // TODO : Unique generator
+                bi3.UriSource = new Uri(@path + ("/graph-" + currentFilename + ".png"), UriKind.Absolute);
                 bi3.EndInit();
                 myImage3.Stretch = Stretch.None;
                 myImage3.Source = bi3;
@@ -230,6 +230,7 @@ namespace Tubes2_App
 
             // Membaca dan mempersiapkan adjancency list dengan membaca input
             // secara baris per baris.
+            System.Windows.Forms.MessageBox.Show(countLines.ToString());
             for (int i=1;i<countLines;i++)
             {
                 string[] splitLine = lines[i].ToString().Split(' ');
