@@ -22,7 +22,6 @@ namespace Tubes2_App
         string currentTargetFriend;
         int lastIndexCurrentAccount;
         int lastIndexCurrentTargetFriend;
-        Dictionary<string, List<string>> adjacencyList;
         List<string> exploreRoute;
         TextBlock descriptionTextBlock;
         TextBlock friendsTextBlock;
@@ -32,6 +31,10 @@ namespace Tubes2_App
         string currentFilename;
         int fileOpenCount;
         int searchingCount;
+
+        Dictionary<string, List<string>> adjacencyList;
+        int[,] adjacencyMatrix;
+        string[] nameList;
 
         // Constructor
         public MainWindow()
@@ -227,26 +230,44 @@ namespace Tubes2_App
         {
             int countLines = lines.Length;
             adjacencyList = new Dictionary<string, List<string>>();
+            adjacencyMatrix = new int[countLines,countLines];
+            nameList = new string[countLines];
 
             // Membaca dan mempersiapkan adjancency list dengan membaca input
             // secara baris per baris.
-            System.Windows.Forms.MessageBox.Show(countLines.ToString());
-            for (int i=1;i<countLines;i++)
+
+            for (int i=0;i<countLines;i++)
             {
                 string[] splitLine = lines[i].ToString().Split(' ');
-                string source = splitLine[0];
-                string dest = splitLine[1];
+                string locationName = splitLine[0];
+                nameList[i] = locationName;
+                adjacencyList[locationName] = new List<string>();
+            }
 
-                if (!adjacencyList.ContainsKey(source))
+            for (int i=0;i<countLines;i++)
+            {
+                string[] splitLine = lines[i].ToString().Split(' ');
+                string source = nameList[i];
+                for (int j=0;j<countLines;j++)
                 {
-                    adjacencyList[source] = new List<string>();
+                    int edgeWeight = Int32.Parse(splitLine[j+1]);
+                    adjacencyMatrix[i,j] = edgeWeight;
+                    if (edgeWeight >= 0) {
+                        string dest = nameList[j];
+                        adjacencyList[source].Add(dest);
+                        adjacencyList[dest].Add(source);
+                    }
                 }
-                if (!adjacencyList.ContainsKey(dest))
-                {
-                    adjacencyList[dest] = new List<string>();
-                }
-                adjacencyList[source].Add(dest);
-                adjacencyList[dest].Add(source);
+
+                // if (!adjacencyList.ContainsKey(source))
+                // {
+                //     adjacencyList[source] = new List<string>();
+                // }
+                // if (!adjacencyList.ContainsKey(dest))
+                // {
+                //     adjacencyList[dest] = new List<string>();
+                // }
+
             }
         }
 
@@ -258,31 +279,37 @@ namespace Tubes2_App
             if (!isExploreGraph)
             {
                 // Create Graph Content
-                for (int i = 1; i < lines.Length; i++)
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    string[] splitLine = lines[i].ToString().Split(' ');
-                    string source = splitLine[0];
-                    string dest = splitLine[1];
+                    for (int j = 0; j < lines.Length; j++)
+                    {
+                        System.Windows.Forms.MessageBox.Show("omasd"); // DEBUG
+                        if (i > j && adjacencyMatrix[i,j] >= 0) // FIXME : Fix input
+                        {
+                            string source = nameList[i];
+                            string dest = nameList[j];
+                            // Styling Graph
+                            var edge = graph.AddEdge(source, dest);
+                            edge.Attr.ArrowheadAtSource = ArrowStyle.None;
+                            edge.Attr.ArrowheadAtTarget = ArrowStyle.None;
+                            Node src = graph.FindNode(source);
+                            Node target = graph.FindNode(dest);
+                            src.Attr.Shape = Shape.Circle;
+                            target.Attr.Shape = Shape.Circle;
+                            src.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
+                            target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
+                            src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+                            target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+                            edge.Attr.Color = Microsoft.Msagl.Drawing.Color.GhostWhite;
+                            edge.Attr.Weight = 700;
 
-                    // Styling Graph
-                    var edge = graph.AddEdge(source, dest);
-                    edge.Attr.ArrowheadAtSource = ArrowStyle.None;
-                    edge.Attr.ArrowheadAtTarget = ArrowStyle.None;
-                    Node src = graph.FindNode(source);
-                    Node target = graph.FindNode(dest);
-                    src.Attr.Shape = Shape.Circle;
-                    target.Attr.Shape = Shape.Circle;
-                    src.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
-                    target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
-                    src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
-                    target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
-                    edge.Attr.Color = Microsoft.Msagl.Drawing.Color.GhostWhite;
-                    edge.Attr.Weight = 700;
-
-                    // Menambah akun unik ke uniqueAccounts
-                    uniqueAccounts.Add(source);
-                    uniqueAccounts.Add(dest);
+                            // Menambah akun unik ke uniqueAccounts
+                            uniqueAccounts.Add(source);
+                            uniqueAccounts.Add(dest);
+                        }
+                    }
                 }
+                System.Windows.Forms.MessageBox.Show("pout"); // DEBUG
 
                 // Create Graph Image
                 Microsoft.Msagl.GraphViewerGdi.GraphRenderer renderer = new Microsoft.Msagl.GraphViewerGdi.GraphRenderer(graph);
