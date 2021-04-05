@@ -202,6 +202,9 @@ namespace Tubes2_App
                 System.Windows.Controls.Image myImage3 = new System.Windows.Controls.Image();
                 myImage3.Source = null;
 
+                // Membuat Adjancency List berdasarkan input .txt
+                generateAdjacencyList();
+
                 // Membuat Graph yang disimpan sebagai .png
                 MakeGraph(currentFilename, false);
 
@@ -217,9 +220,6 @@ namespace Tubes2_App
                 myImage3.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
                 myImage3.VerticalAlignment = System.Windows.VerticalAlignment.Top;
                 graphCanvas.Children.Add(myImage3);
-
-                // Membuat Adjancency List berdasarkan input .txt
-                generateAdjacencyList();
 
                 // handler untuk event ChangeComboBox
                 handleUpdateComboBox();
@@ -258,16 +258,6 @@ namespace Tubes2_App
                         adjacencyList[dest].Add(source);
                     }
                 }
-
-                // if (!adjacencyList.ContainsKey(source))
-                // {
-                //     adjacencyList[source] = new List<string>();
-                // }
-                // if (!adjacencyList.ContainsKey(dest))
-                // {
-                //     adjacencyList[dest] = new List<string>();
-                // }
-
             }
         }
 
@@ -283,8 +273,7 @@ namespace Tubes2_App
                 {
                     for (int j = 0; j < lines.Length; j++)
                     {
-                        System.Windows.Forms.MessageBox.Show("omasd"); // DEBUG
-                        if (i > j && adjacencyMatrix[i,j] >= 0) // FIXME : Fix input
+                        if (i > j && adjacencyMatrix[i,j] >= 0)
                         {
                             string source = nameList[i];
                             string dest = nameList[j];
@@ -301,7 +290,10 @@ namespace Tubes2_App
                             src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
                             target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
                             edge.Attr.Color = Microsoft.Msagl.Drawing.Color.GhostWhite;
-                            edge.Attr.Weight = 700;
+
+                            // TODO : Edge length ?
+                            edge.Attr.Weight = adjacencyMatrix[i,j];
+                            // edge.Attr.Weight = 1;
 
                             // Menambah akun unik ke uniqueAccounts
                             uniqueAccounts.Add(source);
@@ -309,7 +301,10 @@ namespace Tubes2_App
                         }
                     }
                 }
-                System.Windows.Forms.MessageBox.Show("pout"); // DEBUG
+                // System.Windows.Forms.MessageBox.Show(splitLine[j+1]); // DEBUG
+                // System.Windows.Forms.MessageBox.Show("pout"); // DEBUG
+                // System.Windows.Forms.MessageBox.Show("omasd"); // DEBUG
+
 
                 // Create Graph Image
                 Microsoft.Msagl.GraphViewerGdi.GraphRenderer renderer = new Microsoft.Msagl.GraphViewerGdi.GraphRenderer(graph);
