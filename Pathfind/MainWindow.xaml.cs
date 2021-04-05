@@ -33,7 +33,7 @@ namespace Tubes2_App
         int searchingCount;
 
         Dictionary<string, List<string>> adjacencyList;
-        int[,] adjacencyMatrix;
+        float[,] adjacencyMatrix;
         string[] nameList;
 
         // Constructor
@@ -62,6 +62,7 @@ namespace Tubes2_App
             exploreTextBlock.VerticalAlignment = VerticalAlignment.Top;
             exploreTextBlock.TextAlignment = TextAlignment.Center;
 
+            PathfindAStar(); // DEBUG
             if (currentTargetFriend == null)
             {
                 System.Windows.Forms.MessageBox.Show("Harap memilih akun target yang hendak dieksplorasi terlebih dahulu"
@@ -230,7 +231,7 @@ namespace Tubes2_App
         {
             int countLines = lines.Length;
             adjacencyList = new Dictionary<string, List<string>>();
-            adjacencyMatrix = new int[countLines,countLines];
+            adjacencyMatrix = new float[countLines,countLines];
             nameList = new string[countLines];
 
             // Membaca dan mempersiapkan adjancency list dengan membaca input
@@ -250,7 +251,7 @@ namespace Tubes2_App
                 string source = nameList[i];
                 for (int j=0;j<countLines;j++)
                 {
-                    int edgeWeight = Int32.Parse(splitLine[j+1]);
+                    float edgeWeight = float.Parse(splitLine[j+1]);
                     adjacencyMatrix[i,j] = edgeWeight;
                     if (edgeWeight >= 0) {
                         string dest = nameList[j];
@@ -271,29 +272,34 @@ namespace Tubes2_App
                 // Create Graph Content
                 for (int i = 0; i < lines.Length; i++)
                 {
+                    // bool isLoneNode = true;
                     for (int j = 0; j < lines.Length; j++)
                     {
+                        string source = nameList[i];
+                        graph.AddNode(source);
+                        uniqueAccounts.Add(source);
+                        Node src = graph.FindNode(source);
+                        src.Attr.Shape = Shape.Circle;
+                        src.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
+                        src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+
                         if (i > j && adjacencyMatrix[i,j] >= 0)
                         {
-                            string source = nameList[i];
                             string dest = nameList[j];
                             // Styling Graph
                             var edge = graph.AddEdge(source, dest);
                             edge.Attr.ArrowheadAtSource = ArrowStyle.None;
                             edge.Attr.ArrowheadAtTarget = ArrowStyle.None;
-                            Node src = graph.FindNode(source);
-                            Node target = graph.FindNode(dest);
-                            src.Attr.Shape = Shape.Circle;
-                            target.Attr.Shape = Shape.Circle;
-                            src.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
-                            target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
-                            src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
-                            target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
                             edge.Attr.Color = Microsoft.Msagl.Drawing.Color.GhostWhite;
-
                             // TODO : Edge length ?
-                            edge.Attr.Weight = adjacencyMatrix[i,j];
+                            edge.Attr.Weight = (int) adjacencyMatrix[i,j];
                             // edge.Attr.Weight = 1;
+
+                            Node target = graph.FindNode(dest);
+                            target.Attr.Shape = Shape.Circle;
+                            target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
+                            target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+
 
                             // Menambah akun unik ke uniqueAccounts
                             uniqueAccounts.Add(source);
@@ -580,6 +586,113 @@ namespace Tubes2_App
                 currentSpaceIncrement = currentSpaceIncrement + 4;
                 friendCanvas.Children.Add(friendsTextBlock);
             }
+        }
+
+        private int GetIndexFromNameList(string name) {
+            for (int i = 0;i < nameList.Length; i++) {
+                if (name == nameList[i])
+                    return i;
+            }
+            return -1;
+        }
+
+        private void PathfindAStar()
+        {
+            // Inisiasi variabel
+            Dictionary<string, List<string>> Route = new Dictionary<string, List<string>>(); // TODO : Use ?
+            
+            Queue<string> MoveQueue = new Queue<string>();
+            Stack<Queue<string>> ChoiceStack = new Stack<Queue<string>>();
+            Stack<string> CurrentTraversedRoute = new Stack<string>();
+            Dictionary<string, bool> visited = new Dictionary<string, bool>();
+            int currentLocationIndex = GetIndexFromNameList(currentAccount);
+            string currentLocationName = currentAccount;
+            bool isBacktracking = false;
+            string targetLocationName = currentTargetFriend;
+
+            foreach (string node in uniqueAccounts)
+            {
+                visited[node] = false;
+            }
+
+            visited[currentLocationName] = true;
+            CurrentTraversedRoute.Push(currentLocationName);
+
+            // Pathfinding
+            while (currentLocationName != currentTargetFriend) {
+                // System.Windows.Forms.MessageBox.Show(currentLocationName, "Current Location"); // DEBUG
+
+                // Creating branch only if not backtracking
+                // Get sorted distance and put to choice stack
+                if (!isBacktracking) {
+                    // List carrying tuple of target location name and distance
+                    List<Tuple<string,float>> distanceList = new List<Tuple<string,float>>();
+                    for (int i = 0; i < nameList.Length; i++) {
+                        if (currentLocationIndex != i && !visited[nameList[i]] && adjacencyMatrix[currentLocationIndex,i] >= 0)
+                            distanceList.Add(new Tuple<string, float> (nameList[i], adjacencyMatrix[currentLocationIndex,i]));
+                    }
+
+                    // Sorting list with Linq, ascending order
+                    List<Tuple<string,float>> sortedDistance = distanceList.OrderBy(obj=>obj.Item2).ToList();
+
+                    // Creating available path queue from sorted list
+                    Queue<string> AvailableBranch = new Queue<string>();
+                    foreach (var entry in sortedDistance) {
+                        AvailableBranch.Enqueue(entry.Item1);
+                    }
+
+                    // Push available path queue to choice stack
+                    ChoiceStack.Push(AvailableBranch);
+                }
+
+                // Move taking
+                if (ChoiceStack.Count != 0) {
+                    // If choice stack is not exhausted
+                    Queue<string> TopMostBranch = ChoiceStack.Peek();
+                    if (TopMostBranch.Count != 0) {
+                        // If choice queue in choice stack is not empty,
+                        // Move to that location
+                        currentLocationName = TopMostBranch.Peek();
+                        currentLocationIndex = GetIndexFromNameList(currentLocationName);
+                        TopMostBranch.Dequeue();
+
+                        isBacktracking = false;
+                        // | Trying new path, so algorithm is stopped backtracking
+                        CurrentTraversedRoute.Push(currentLocationName);
+                        // | Put selected path to route stack
+                        visited[currentLocationName] = true;
+                        // | Flagging location as visited
+                    }
+                    else {
+                        // If choice queue is empty, pop choice stack and backtrack
+                        ChoiceStack.Pop();
+                        isBacktracking = true;
+                        // | Set mode to backtracking
+                        visited[currentLocationName] = false;
+                        // | Backtracking, removing old path visited flags
+                        string LastLocation = CurrentTraversedRoute.Peek(); // DEBUG
+                        CurrentTraversedRoute.Pop();
+                        // | Remove last path from route stack
+                    }
+                }
+                else {
+                    // If choice stack is exhausted, then no path found
+                    System.Windows.Forms.MessageBox.Show("path not found"); // DEBUG
+                    // TODO : Do something if no path found
+                    break;
+                }
+
+            }
+
+            // DEBUG
+            // Reversed path printing
+            string TargetToCurrent = "";
+            while (CurrentTraversedRoute.Count != 0) {
+                // System.Windows.Forms.MessageBox.Show(CurrentTraversedRoute.Peek(), count.ToString()); // DEBUG
+                TargetToCurrent = TargetToCurrent + " " + CurrentTraversedRoute.Peek();
+                CurrentTraversedRoute.Pop();
+            }
+            System.Windows.Forms.MessageBox.Show(TargetToCurrent, "Route end to start"); // DEBUG
         }
 
         private bool BFS_Explore()
