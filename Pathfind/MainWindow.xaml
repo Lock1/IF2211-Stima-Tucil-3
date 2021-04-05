@@ -14,8 +14,8 @@
         <Grid Grid.Column="0" Panel.ZIndex="10">
             <Grid.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#F8B195" Offset="0"/>
-                    <GradientStop Color="#F67280" Offset="1"/>
+                    <GradientStop Color="#FFC06C84" Offset="0"/>
+                    <GradientStop Color="#FF6C5B7B" Offset="1"/>
                 </LinearGradientBrush>
             </Grid.Background>
             <Grid Margin="0,50,0,0">
@@ -30,9 +30,9 @@
                         <DropShadowEffect BlurRadius="0" ShadowDepth="1" Opacity="0.1"/>
                     </TextBlock.Effect>
                     <TextBlock.Foreground>
-                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="#FF6C5B7B" Offset="0"/>
-                            <GradientStop Color="#FF355C7B" Offset="1"/>
+                        <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                            <GradientStop Color="#FFFFE5B4" Offset="0.152"/>
+                            <GradientStop Color="#FFF8B195" Offset="0.027"/>
                         </LinearGradientBrush>
                     </TextBlock.Foreground>
                 </TextBlock>
@@ -42,15 +42,21 @@
                     </TextBlock.Effect>
                     <TextBlock.Foreground>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="#FFC06C84" Offset="0"/>
-                            <GradientStop Color="#FF6C5B7B" Offset="0.864"/>
+                            <GradientStop Color="#FFEFD2C7" Offset="1"/>
+                            <GradientStop Color="#FFFAF0EC"/>
                         </LinearGradientBrush>
                     </TextBlock.Foreground>
                 </TextBlock>
                 <Grid Grid.Row="2">
-                    <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="66" Margin="0,25,0,0" VerticalAlignment="Top" Width="507" CornerRadius="8" Background="#FF8D59FF" Panel.ZIndex="-1" Opacity="0.05"/>
-                    <TextBlock HorizontalAlignment="Center" Height="20" Margin="0,32,0,0" TextWrapping="Wrap" Text="TRACK GRAPH" VerticalAlignment="Top" Width="269" RenderTransformOrigin="1.557,0.5" Style="{StaticResource VigaFont}" TextAlignment="Center" Foreground="#FF355C7D"/>
-                    <Button Content="Browse" HorizontalAlignment="Center" Height="20" Margin="0,57,0,0" VerticalAlignment="Top" Width="59" Click="Browse_File_Button" Name="BrowseButton" RenderTransformOrigin="0.49,0.7" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="#FFC06C84" Foreground="White" BorderBrush="{x:Null}" Opacity="0.8" Style="{StaticResource VigaFont}"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="249*"/>
+                        <ColumnDefinition Width="125*"/>
+                        <ColumnDefinition Width="37*"/>
+                        <ColumnDefinition Width="236*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="66" Margin="70,25,70.2,-0.6" VerticalAlignment="Top" Width="507" CornerRadius="8" Background="#FFF1D8CE" Panel.ZIndex="-1" Opacity="0.075" Grid.ColumnSpan="4"/>
+                    <TextBlock HorizontalAlignment="Center" Height="20" Margin="189,32,189.2,0" TextWrapping="Wrap" Text="TRACK GRAPH" VerticalAlignment="Top" Width="269" RenderTransformOrigin="1.557,0.5" Style="{StaticResource VigaFont}" TextAlignment="Center" Foreground="#FFEFD2C7" Grid.ColumnSpan="4"/>
+                    <Button Content="Browse" HorizontalAlignment="Center" Height="20" Margin="44.6,57,21.4,0" VerticalAlignment="Top" Width="59" Click="Browse_File_Button" Name="BrowseButton" RenderTransformOrigin="0.49,0.7" ScrollViewer.HorizontalScrollBarVisibility="Auto" Background="#FFF67280" Foreground="White" BorderBrush="{x:Null}" Opacity="0.8" Style="{StaticResource VigaFont}" Grid.Column="1"/>
                 </Grid>
                 <Grid Grid.Row="3" HorizontalAlignment="Center" Height="500" Margin="0,20,0,0" VerticalAlignment="Top" Width="600" Name="graphCanvas"/>
             </Grid>
@@ -58,8 +64,8 @@
         <Grid Grid.Column="1">
             <Grid.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#C06C84" Offset="0"/>
-                    <GradientStop Color="#6C5B7B" Offset="1"/>
+                    <GradientStop Color="#F8B195" Offset="0"/>
+                    <GradientStop Color="#F67280" Offset="1"/>
                 </LinearGradientBrush>
             </Grid.Background>
             <Grid Margin="0,20,0,0">
@@ -73,21 +79,21 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0" Margin="0,0,0,0">
-                    <TextBlock HorizontalAlignment="Center" Margin="0,0,0,0" TextWrapping="Wrap" Text="Which person to stalk?" Width="133" Foreground="#FFFAF0EC" Style="{StaticResource VigaFont}" TextAlignment="Center"/>
+                    <TextBlock HorizontalAlignment="Center" Margin="0,0,0,0" TextWrapping="Wrap" Text="Which person to stalk?" Width="133" Foreground="#FF6C5B7B" Style="{StaticResource VigaFont}" TextAlignment="Center"/>
                 </Grid>
                 <Grid Grid.Row="1" Margin="0,0,0,0">
                     <ComboBox HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" VerticalAlignment="Top" Width="76" Name="Choose_Account_ComboBox" SelectionChanged="Choose_Account_ComboBox_SelectionChanged" RenderTransformOrigin="0.808,0.57"/>
                 </Grid>
                 <Grid Grid.Row="2" Margin="0,0,0,0">
-                    <TextBlock HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" TextWrapping="Wrap" Text="Explore Friends With" VerticalAlignment="Top" Width="133" Foreground="#FFFAF0EC" Style="{StaticResource VigaFont}" TextAlignment="Center"/>
+                    <TextBlock HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" TextWrapping="Wrap" Text="Explore Friends With" VerticalAlignment="Top" Width="133" Foreground="#FF6C5B7B" Style="{StaticResource VigaFont}" TextAlignment="Center"/>
                 </Grid>
                 <Grid Grid.Row="3" Margin="0,0,0,0">
                     <ComboBox HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" VerticalAlignment="Top" Width="76" Name="Explore_ComboBox" SelectionChanged="Explore_ComboBox_SelectionChanged"/>
                 </Grid>
                 <Grid Grid.Row="4" Margin="0,10,0,0">
-                    <TextBlock HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" TextWrapping="Wrap" Text="How would you find your true friends?" VerticalAlignment="Top" Width="229" Foreground="#FFFAF0EC" TextAlignment="Center" Style="{StaticResource VigaFont}"/>
-                    <RadioButton Content="DFS" HorizontalAlignment="Center" Height="20" Margin="70,20,0,0" VerticalAlignment="Top" Width="50" Checked="DFS_Checked" RenderTransformOrigin="0.108,0.5" Foreground="#FFFAF0EC" FontWeight="Bold" Opacity="0.8" Name="DFS_Radio"/>
-                    <RadioButton Content="BFS" HorizontalAlignment="Center" Height="20" Margin="0,20,70,0" VerticalAlignment="Top" Width="50" Checked="BFS_Checked" Foreground="#FFFAF0EC" FontWeight="Bold" Opacity="0.8" Name="BFS_Radio"/>
+                    <TextBlock HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" TextWrapping="Wrap" Text="How would you find your true friends?" VerticalAlignment="Top" Width="229" Foreground="#FF6C5B7B" TextAlignment="Center" Style="{StaticResource VigaFont}"/>
+                    <RadioButton Content="DFS" HorizontalAlignment="Center" Height="20" Margin="70,20,0,0" VerticalAlignment="Top" Width="50" Checked="DFS_Checked" RenderTransformOrigin="0.108,0.5" Foreground="#FF6C5B7B" FontWeight="Bold" Opacity="0.8" Name="DFS_Radio"/>
+                    <RadioButton Content="BFS" HorizontalAlignment="Center" Height="20" Margin="0,20,70,0" VerticalAlignment="Top" Width="50" Checked="BFS_Checked" Foreground="#FF6C5B7B" FontWeight="Bold" Opacity="0.8" Name="BFS_Radio"/>
                 </Grid>
                 <Button Grid.Row="5" Content="Search" HorizontalAlignment="Center" Height="25" Margin="0,10,0,0" VerticalAlignment="Top" Width="61" Click="Search_Click" Background="#FFF67280" Foreground="White" BorderBrush="{x:Null}" Opacity="0.8" Style="{StaticResource VigaFont}"/>
                 <Grid Grid.Row="6">
