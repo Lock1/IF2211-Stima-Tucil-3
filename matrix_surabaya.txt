@@ -1,0 +1,8 @@
+Monkasel -1 830.12 266.68 -1 -1 -1 -1 -1
+Grand_city 830.12 -1 492.83 -1 -1 -1 594.66 -1
+Stasiun_Gubeng 266.68 492.83 -1 -1 979.18 -1 -1 -1
+Masjid_Cheng_Hoo -1 -1 -1 -1 -1 1860 1210 -1
+RS_Dr_Sutomo -1 -1 979.18 -1 -1 876.93 -1 -1
+Pasar_Pacarkeling -1 -1 -1 1860 876.93 -1 -1 -1
+Sate_Kelopo_Ondomohen -1 594.66 -1 1210 -1 -1 -1 1150
+Tunjungan -1 -1 -1 -1 -1 -1 -1 1150

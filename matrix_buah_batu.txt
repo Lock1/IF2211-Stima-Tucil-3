@@ -1,0 +1,8 @@
+Pizza_Hut_Buahbatu -1 1050 685.48 293.37 179.66 -1 -1 -1
+RSAI_Buahbatu 1050 -1 -1 -1 -1 -1 -1 -1
+Mandiri_University 685.48 -1 -1 -1 -1 -1 -1 -1
+Metro_Indah_Mall 293.37 -1 -1 -1 -1 -1 -1 -1
+Gudang_Garam 179.66 -1 -1 -1 -1 -1 -1 -1
+Edelweiss_Hospital -1 -1 459.26 -1 -1 -1 501.05 505.03
+Alfamart -1 -1 -1 -1 -1 501.05 -1 375.96
+KPU_Bandung -1 -1 -1 -1 -1 505.03 375.96 -1
