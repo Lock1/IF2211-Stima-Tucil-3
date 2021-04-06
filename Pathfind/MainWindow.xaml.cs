@@ -23,7 +23,6 @@ namespace Tubes2_App
         int lastIndexCurrentAccount;
         int lastIndexCurrentTargetFriend;
         List<string> exploreRoute;
-        TextBlock descriptionTextBlock;
         TextBlock friendsTextBlock;
         TextBlock exploreTextBlock;
         bool DFSSolution;
@@ -41,10 +40,8 @@ namespace Tubes2_App
         {
             InitializeComponent();
             exploreRoute = new List<string>();
-            descriptionTextBlock = new TextBlock();
             friendsTextBlock = new TextBlock();
             exploreTextBlock = new TextBlock();
-            descriptionTextBlock.TextAlignment = TextAlignment.Center;
             currentFilename = "";
             fileOpenCount = 0;
             searchingCount = 0;
@@ -62,107 +59,8 @@ namespace Tubes2_App
             exploreTextBlock.VerticalAlignment = VerticalAlignment.Top;
             exploreTextBlock.TextAlignment = TextAlignment.Center;
 
-            PathfindAStar(); // DEBUG
-            if (currentTargetFriend == null)
-            {
-                System.Windows.Forms.MessageBox.Show("Harap memilih akun target yang hendak dieksplorasi terlebih dahulu"
-                    , "Error Title", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-            else if (selectedRadio == "")
-            {
-                System.Windows.Forms.MessageBox.Show("Harap memilih DFS atau BFS terlebih dahulu"
-                    , "Error Title", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-            else {
-                if(selectedRadio == "DFS")
-                {
-                    isExplorable = DFS_Explore();
-                }
-                else
-                {
-                    isExplorable = BFS_Explore();
-                }
+            isExplorable = PathfindAStar(); // DEBUG
 
-                Run text;
-                var bc = new BrushConverter();
-
-                text = new Run("\nExplore Friends With " + currentTargetFriend);
-                text.Foreground = (System.Windows.Media.Brush)bc.ConvertFrom("#FF522E92");
-                text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                exploreTextBlock.Inlines.Add(text);
-                if (isExplorable)
-                {
-
-                    text = new Run("\n\nNama akun : " + currentAccount + " dan " + currentTargetFriend);
-                    text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                    exploreTextBlock.Inlines.Add(text);
-                    text = new Run("\n\n" + (exploreRoute.Count - 2).ToString() + " degree connection");
-                    text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                    exploreTextBlock.Inlines.Add(text);
-                    for (int i=0;i<exploreRoute.Count;i++)
-                    {
-                        if (i == 0)
-                        {
-                            text = new Run("\n" + exploreRoute[i]);
-                            text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                            exploreTextBlock.Inlines.Add(text);
-                        }
-                        else
-                        {
-                            text = new Run(" -> " + exploreRoute[i]);
-                            text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                            exploreTextBlock.Inlines.Add(text);
-                        }
-                    }
-
-                    // Menggambar Explore Graph
-                    searchingCount++;
-                    MakeGraph(currentFilename + "-" + searchingCount.ToString(), true);
-                    System.Windows.Controls.Image myImage3 = new System.Windows.Controls.Image();
-                    myImage3.Source = null;
-
-                    // Setting Directory
-                    string path = Environment.CurrentDirectory;
-                    BitmapImage bi3 = new BitmapImage();
-                    bi3.BeginInit();
-                    bi3.UriSource = new Uri(@path + ("/explore-" + currentFilename + "-" + searchingCount.ToString() + ".png"), UriKind.Absolute); // TODO : Fix
-                    bi3.EndInit();
-
-                    // Setting Image Attributes
-                    myImage3.Stretch = Stretch.None;
-                    myImage3.Source = bi3;
-                    myImage3.Width = 200;
-                    myImage3.Height = 500;
-                    myImage3.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
-                    myImage3.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                    exploreGraph.Children.Add(myImage3);
-                }
-                else
-                {
-                    text = new Run("\n\nNama akun : " + currentAccount + " dan " + currentTargetFriend);
-                    text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                    exploreTextBlock.Inlines.Add(text);
-                    text = new Run("\n\nTidak ada jalur koneksi yang tersedia");
-                    text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                    exploreTextBlock.Inlines.Add(text);
-                    text = new Run("\nAnda harus memulai koneksi baru itu sendiri");
-                    text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                    exploreTextBlock.Inlines.Add(text);
-                }
-
-                // Merender ulang komponen XAML exploreCanvas
-                exploreCanvas.Children.Add(exploreTextBlock);
-            }
-        }
-
-        private void DFS_Checked(object sender, RoutedEventArgs e)
-        {
-            selectedRadio = "DFS";
-        }
-
-        private void BFS_Checked(object sender, RoutedEventArgs e)
-        {
-            selectedRadio = "BFS";
         }
 
         private void Browse_File_Button(object sender, RoutedEventArgs e)
@@ -187,8 +85,6 @@ namespace Tubes2_App
                 lastIndexCurrentAccount = -1;
                 lastIndexCurrentTargetFriend = -1;
                 selectedRadio = "";
-                BFS_Radio.IsChecked = false;
-                DFS_Radio.IsChecked = false;
 
 
                 // Get directory file .txt yang dipilih
@@ -217,10 +113,27 @@ namespace Tubes2_App
                 myImage3.Stretch = Stretch.None;
                 myImage3.Source = bi3;
                 myImage3.Width = 600;
-                myImage3.Height = 500;
+                myImage3.Height = 400;
                 myImage3.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
                 myImage3.VerticalAlignment = System.Windows.VerticalAlignment.Top;
                 graphCanvas.Children.Add(myImage3);
+
+                TextBlock legendTextBlock = new TextBlock();
+                legendTextBlock.TextAlignment = TextAlignment.Center;
+                Run text;
+                text = new Run("\nLegend");
+                var bc = new BrushConverter();
+                text.Foreground = (System.Windows.Media.Brush)bc.ConvertFrom("#FFFFE5B4");
+                text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
+                text.FontSize = 18;
+                legendTextBlock.Inlines.Add(text);
+
+                Run text2 = new Run("\nA : Jakarta");
+                text2.Foreground = (System.Windows.Media.Brush)bc.ConvertFrom("#F8B195");
+                text2.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
+                text2.FontSize = 14;
+                legendTextBlock.Inlines.Add(text2);
+                legendCanvas.Children.Add(legendTextBlock);
 
                 // handler untuk event ChangeComboBox
                 handleUpdateComboBox();
@@ -287,10 +200,15 @@ namespace Tubes2_App
                         {
                             string dest = nameList[j];
                             // Styling Graph
-                            var edge = graph.AddEdge(source, dest);
+                            var edge = graph.AddEdge(source, " " + adjacencyMatrix[i, j].ToString() + " ", dest);
                             edge.Attr.ArrowheadAtSource = ArrowStyle.None;
                             edge.Attr.ArrowheadAtTarget = ArrowStyle.None;
+                            edge.Label.FontColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
+                            edge.Label.FontSize = 5;
+                            edge.Label.Size = new Microsoft.Msagl.Core.DataStructures.Size(60, 60);
                             edge.Attr.Color = Microsoft.Msagl.Drawing.Color.GhostWhite;
+                            //edge.Label = new Microsoft.Msagl.Drawing.Label(adjacencyMatrix[i, j].ToString());
+                            //edge.LabelText = "Halo";
                             // TODO : Edge length ?
                             edge.Attr.Weight = (int) adjacencyMatrix[i,j];
                             // edge.Attr.Weight = 1;
@@ -299,6 +217,7 @@ namespace Tubes2_App
                             target.Attr.Shape = Shape.Circle;
                             target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
                             target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+                            target.Attr.Padding = 20;
 
 
                             // Menambah akun unik ke uniqueAccounts
@@ -316,10 +235,10 @@ namespace Tubes2_App
                 Microsoft.Msagl.GraphViewerGdi.GraphRenderer renderer = new Microsoft.Msagl.GraphViewerGdi.GraphRenderer(graph);
                 renderer.CalculateLayout();
                 graph.Attr.BackgroundColor = Microsoft.Msagl.Drawing.Color.Transparent;
-                int height = 500;
+                int height = 360;
                 if (graph.Width > graph.Height && graph.Width > 400)
                 {
-                    height = 200;
+                    height = 160;
                 }
                 else if (graph.Width / graph.Height > 1.3)
                 {
@@ -331,7 +250,7 @@ namespace Tubes2_App
                 }
                 else if (graph.Width * (height / graph.Height) > 500)
                 {
-                    height = 300;
+                    height = 250;
                 }
 
                 graphBitmap = new Bitmap((int)(graph.Width *
@@ -456,17 +375,6 @@ namespace Tubes2_App
                 currentAccount = Choose_Account_ComboBox.SelectedItem.ToString();
                 lastIndexCurrentTargetFriend = Explore_ComboBox.Items.IndexOf(currentAccount);
                 Explore_ComboBox.Items.Remove(currentAccount);
-
-                friendCanvas.Children.Clear();
-                exploreCanvas.Children.Clear();
-                friendsTextBlock.Inlines.Clear();
-                descriptionTextBlock.Inlines.Clear();
-                descriptionTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
-                exploreTextBlock.Inlines.Clear();
-                exploreTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
-
-                // Memanggil kembali rekomendasi teman.
-                Friend_Recommendation();
             }
         }
 
@@ -484,110 +392,6 @@ namespace Tubes2_App
             }
         }
 
-        private void Friend_Recommendation()
-        {
-            // Mencetak judul
-            Run text;
-            text = new Run("\nFriend Recommendations for " + currentAccount);
-            var bc = new BrushConverter();
-            text.Foreground = (System.Windows.Media.Brush)bc.ConvertFrom("#FF522E92");
-            text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-            descriptionTextBlock.Inlines.Add(text);
-
-            HashSet<string> uniqueFriendRecommendations = new HashSet<string>();
-            HashSet<string> sortedFriendRecommendations = new HashSet<string>();
-            Dictionary<string, List<string>> mutualConnections = new Dictionary<string, List<string>>();
-            List<int> numOfMutuals = new List<int>();
-
-            // Pencarian Friend Recommendation berdasarkan mutual friends
-            var currentNode = adjacencyList[currentAccount];
-            for (int m = 0; m < currentNode.Count; m++)
-            {
-                var currentMutualNode = adjacencyList[currentNode[m]];
-                for (int n = 0; n < currentMutualNode.Count; n++)
-                {
-                    var candidateFriend = currentMutualNode[n];
-                    if (!mutualConnections.ContainsKey(candidateFriend))
-                    {
-                        List<string> temp = new List<string>();
-                        mutualConnections[candidateFriend] = temp;
-                    }
-                    if (candidateFriend != currentAccount && !currentNode.Contains(candidateFriend))
-                    {
-                        uniqueFriendRecommendations.Add(candidateFriend);
-                        if (!mutualConnections[candidateFriend].Contains(currentNode[m]))
-                        {
-                            mutualConnections[candidateFriend].Add(currentNode[m]);
-                        }
-                    }
-                }
-            }
-
-            // Sort untuk ditampilkan dari mutual friends terbanyak lebih dahulu
-            foreach (string friendRecommendation in uniqueFriendRecommendations)
-            {
-                numOfMutuals.Add(mutualConnections[friendRecommendation].Count);
-            }
-            numOfMutuals.Sort();
-
-            for(int i=numOfMutuals.Count-1; i>=0; i--)
-            {
-                foreach (string friendRecommendation in uniqueFriendRecommendations)
-                {
-                    if(mutualConnections[friendRecommendation].Count == numOfMutuals[i])
-                    {
-                        sortedFriendRecommendations.Add(friendRecommendation);
-                    }
-                }
-            }
-
-            friendCanvas.Children.Add(descriptionTextBlock);
-            // Mencetak Friend Recommendation ke layar
-            int currentSpaceIncrement = 0;
-            if(sortedFriendRecommendations.Count == 0)
-            {
-                friendsTextBlock = new TextBlock();
-                friendsTextBlock.TextAlignment = TextAlignment.Center;
-
-                text = new Run("\n\n\nTidak ada rekomendasi teman untuk akun ini");
-                text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                friendsTextBlock.Inlines.Add(text);
-
-                friendCanvas.Children.Add(friendsTextBlock);
-            }
-            foreach (string friendRecommendation in sortedFriendRecommendations)
-            {
-                friendsTextBlock = new TextBlock();
-                friendsTextBlock.TextAlignment = TextAlignment.Center;
-
-                for (int k = 0; k < currentSpaceIncrement; k++)
-                {
-                    friendsTextBlock.Inlines.Add(new Run("\n"));
-                }
-                text = new Run("\n\n\nNama akun : " + friendRecommendation);
-                text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                friendsTextBlock.Inlines.Add(text);
-                text = new Run("\n" + mutualConnections[friendRecommendation].Count + " mutual friends : ");
-                text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                friendsTextBlock.Inlines.Add(text);
-                for (int k = 0; k < mutualConnections[friendRecommendation].Count; k++)
-                {
-                    if(k != 0)
-                    {
-                        text = new Run(", " + mutualConnections[friendRecommendation][k]);
-                    }
-                    else
-                    {
-                        text = new Run("" + mutualConnections[friendRecommendation][k]);
-                    }
-                    text.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                    friendsTextBlock.Inlines.Add(text);
-                }
-                currentSpaceIncrement = currentSpaceIncrement + 4;
-                friendCanvas.Children.Add(friendsTextBlock);
-            }
-        }
-
         private int GetIndexFromNameList(string name) {
             for (int i = 0;i < nameList.Length; i++) {
                 if (name == nameList[i])
@@ -596,7 +400,7 @@ namespace Tubes2_App
             return -1;
         }
 
-        private void PathfindAStar()
+        private bool PathfindAStar()
         {
             // Inisiasi variabel
             Dictionary<string, List<string>> Route = new Dictionary<string, List<string>>(); // TODO : Use ?
@@ -609,6 +413,7 @@ namespace Tubes2_App
             string currentLocationName = currentAccount;
             bool isBacktracking = false;
             string targetLocationName = currentTargetFriend;
+            bool isSolutionFound = true;
 
             foreach (string node in uniqueAccounts)
             {
@@ -679,6 +484,7 @@ namespace Tubes2_App
                     // If choice stack is exhausted, then no path found
                     System.Windows.Forms.MessageBox.Show("path not found"); // DEBUG
                     // TODO : Do something if no path found
+                    isSolutionFound = false;
                     break;
                 }
 
@@ -693,118 +499,8 @@ namespace Tubes2_App
                 CurrentTraversedRoute.Pop();
             }
             System.Windows.Forms.MessageBox.Show(TargetToCurrent, "Route end to start"); // DEBUG
-        }
 
-        private bool BFS_Explore()
-        {
-            // Inisiasi variabel
-            Queue<string> BFSQueue = new Queue<string>();
-            Dictionary<string, bool> visited = new Dictionary<string, bool>();
-            bool solutionFound = false;
-            List<string> expandNode;
-            Dictionary<string, List<string>> Route = new Dictionary<string, List<string>>();
-            string expandAccount;
-
-            foreach (string node in uniqueAccounts)
-            {
-                visited[node] = false;
-            }
-
-            // BFS secara iteratif
-            expandAccount = currentAccount;
-            visited[expandAccount] = true;
-            while (!solutionFound)
-            {
-                expandNode = adjacencyList[expandAccount];
-                for (int i=0;i<expandNode.Count;i++)
-                {
-                    string currentFocusAccount = expandNode[i];
-                    if (!visited[currentFocusAccount])
-                    {
-                        visited[currentFocusAccount] = true;
-                        Route[currentFocusAccount] = new List<string>();
-                        if (Route.ContainsKey(expandAccount))
-                        {
-                            Route[currentFocusAccount] = Route[currentFocusAccount].Concat(Route[expandAccount]).ToList();
-                        }
-                        Route[currentFocusAccount].Add(expandAccount);
-                        BFSQueue.Enqueue(currentFocusAccount);
-                        if (currentFocusAccount == currentTargetFriend)
-                        {
-                            Route[currentFocusAccount].Add(currentFocusAccount);
-                            exploreRoute = Route[currentFocusAccount];
-                            solutionFound = true;
-                            break;
-                        }
-                    }
-                }
-                if(BFSQueue.Count != 0)
-                {
-                    expandAccount = BFSQueue.Dequeue();
-                }
-                else
-                {
-                    break;
-                }
-            }
-            return solutionFound;
-        }
-
-        private bool DFS_Explore()
-        {
-            // Main untuk pencarian dengan DFS. Menginisiasi variabel dan memanggil
-            // DFS_Recursion (DFS secara rekursif).
-            Dictionary<string, bool> visited = new Dictionary<string, bool>();
-            List<string> Route = new List<string>();
-            DFSSolution = false;
-            int num_of_visited;
-
-            foreach (string node in uniqueAccounts)
-            {
-                visited[node] = false;
-            }
-
-            num_of_visited = visited.Count;
-
-            DFS_Recursion(currentAccount, visited, num_of_visited, Route);
-            return DFSSolution;
-        }
-
-        private void DFS_Recursion(string currentFocusAccount, Dictionary<string, bool> visited, int num_of_visited, List<string> Route)
-        {
-            if (currentFocusAccount == currentTargetFriend)
-            {
-                // Basis apabila telah ditemukan friend yang hendak di-explore.
-                DFSSolution = true;
-                Route.Add(currentTargetFriend);
-                exploreRoute = Route;
-            }
-            else if (num_of_visited < 1 && currentFocusAccount != currentTargetFriend && !DFSSolution)
-            {
-                // Basis terminasi karena tidak ditemukan path menuju target.
-            }
-            else
-            {
-                // Rekurens
-                Route.Add(currentFocusAccount);
-                visited[currentFocusAccount] = true;
-                num_of_visited--;
-                List<string> expandNode = adjacencyList[currentFocusAccount];
-                int i = 0;
-
-                while (i<expandNode.Count && !DFSSolution)
-                {
-                    if(!visited[expandNode[i]])
-                    {
-                        DFS_Recursion(expandNode[i], visited, num_of_visited, Route);
-                    }
-                    i++;
-                }
-                if(!DFSSolution)
-                {
-                    Route.Remove(currentFocusAccount);
-                }
-            }
+            return isSolutionFound;
         }
     }
 }

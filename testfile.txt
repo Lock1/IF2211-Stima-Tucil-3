@@ -1,5 +1,5 @@
-dago -1 200 100 400 -1
-bca 200 -1 -1 50 -1
-itb 100 -1 -1 -1 -1
-kos 400 50 -1 -1 -1
-kotalain -1 -1 -1 -1 -1
+Dago_Atas -1 200 100 400 -1
+Bank_BCA 200 -1 -1 50 -1
+Kampus_ITB 100 -1 -1 -1 -1
+Kos_Cisitu 400 50 -1 -1 -1
+Tamansari -1 -1 -1 -1 -1
