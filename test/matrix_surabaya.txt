@@ -6,3 +6,11 @@ RS_Dr_Sutomo -1 -1 979.18 -1 -1 876.93 -1 -1
 Pasar_Pacarkeling -1 -1 -1 1860 876.93 -1 -1 -1
 Sate_Kelopo_Ondomohen -1 594.66 -1 1210 -1 -1 -1 1150
 Tunjungan -1 -1 -1 -1 -1 -1 -1 1150
+Monkasel -7.26544 112.75028
+Grand_city -7.26193 112.74997
+Stasiun_Gubeng -7.26546 112.75200
+Masjid_Cheng_Hoo -7.25199 112.74717
+RS_Dr_Sutomo -7.26793 112.75676
+Pasar_Pacarkeling -7.25995 112.75909
+Sate_Kelopo_Ondomohen -7.26011 112.74419
+Tunjungan -7.25612 112.73778

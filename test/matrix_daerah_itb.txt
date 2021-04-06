@@ -5,4 +5,12 @@ RS_Borromeus -1 721.88 302.61 -1 293.75 -1 -1 -1
 ITB_Depan -1 -1 -1 293.75 -1 229.62 -1 -1
 Jl_Tamansari 1160 -1 -1 -1 229.62 -1 1030 -1
 Sabuga 473.47 -1 -1 -1 -1 1030 -1 -1
-Mc_Donald_Dago -1 261.92 -1 -1 -1 -1 -1 -1 
+Mc_Donald_Dago -1 261.92 -1 -1 -1 -1 -1 -1
+ITB_Belakang -6.88731 107.61146
+Jl_Ir_H_Juanda-Dago -6.88743 107.61357
+Kantor_Cabang_BCA -6.89121 107.61377
+RS_Borromeus -6.89377 107.61296
+ITB_Depan -6.89323 107.61046
+Jl_Tamansari -6.89386 107.60840
+Sabuga -6.88648 107.60752
+Mc_Donald_Dago -6.88487 107.61345
