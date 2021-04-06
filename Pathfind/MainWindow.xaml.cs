@@ -32,6 +32,7 @@ namespace Tubes2_App
         string currentFilename;
         int fileOpenCount;
         int searchingCount;
+        float TotalPathWeight;
 
         Dictionary<string, List<string>> adjacencyList;
         float[,] adjacencyMatrix;
@@ -162,7 +163,7 @@ namespace Tubes2_App
                     legendTextBlock.Inlines.Add(text2);
                     i++;
                 }
-                
+
                 legendCanvas.Children.Add(legendTextBlock);
 
                 // handler untuk event ChangeComboBox
@@ -220,7 +221,7 @@ namespace Tubes2_App
                     {
                         int currentLength;
                         string source = nameList[i];
-                        
+
 
                         //string alphaSource = (uniqueAccounts.ToList().IndexOf(source) + 1).ToString();
                         currentLength = uniqueAccounts.Count;
@@ -265,7 +266,7 @@ namespace Tubes2_App
                             target.Attr.Padding = 20;
 
 
-                            
+
                         }
                     }
                 }
@@ -399,7 +400,7 @@ namespace Tubes2_App
                             {
                                 edge.Attr.Color = Microsoft.Msagl.Drawing.Color.LightPink;
                             }
-                            
+
                         }
                     }
                 }
@@ -498,10 +499,10 @@ namespace Tubes2_App
             // Inisiasi variabel
             exploreRoute = new List<string>();
             Dictionary<string, List<string>> Route = new Dictionary<string, List<string>>(); // TODO : Use ?
-            
+
             Queue<string> MoveQueue = new Queue<string>();
-            Stack<Queue<string>> ChoiceStack = new Stack<Queue<string>>();
-            Stack<string> CurrentTraversedRoute = new Stack<string>();
+            Stack<Queue<Tuple<string,float>>> ChoiceStack = new Stack<Queue<Tuple<string,float>>>();
+            Stack<Tuple<string,float>> CurrentTraversedRoute = new Stack<Tuple<string,float>>();
             Dictionary<string, bool> visited = new Dictionary<string, bool>();
             int currentLocationIndex = GetIndexFromNameList(currentAccount);
             string currentLocationName = currentAccount;
@@ -515,7 +516,8 @@ namespace Tubes2_App
             }
 
             visited[currentLocationName] = true;
-            CurrentTraversedRoute.Push(currentLocationName);
+            CurrentTraversedRoute.Push(new Tuple<string,float>(currentLocationName,0));
+            TotalPathWeight = 0;
 
             // Pathfinding
             while (currentLocationName != currentTargetFriend) {
@@ -535,9 +537,9 @@ namespace Tubes2_App
                     List<Tuple<string,float>> sortedDistance = distanceList.OrderBy(obj=>obj.Item2).ToList();
 
                     // Creating available path queue from sorted list
-                    Queue<string> AvailableBranch = new Queue<string>();
+                    Queue<Tuple<string,float>> AvailableBranch = new Queue<Tuple<string,float>>();
                     foreach (var entry in sortedDistance) {
-                        AvailableBranch.Enqueue(entry.Item1);
+                        AvailableBranch.Enqueue(entry);
                     }
 
                     // Push available path queue to choice stack
@@ -547,17 +549,19 @@ namespace Tubes2_App
                 // Move taking
                 if (ChoiceStack.Count != 0) {
                     // If choice stack is not exhausted
-                    Queue<string> TopMostBranch = ChoiceStack.Peek();
+                    Queue<Tuple<string,float>> TopMostBranch = ChoiceStack.Peek();
                     if (TopMostBranch.Count != 0) {
                         // If choice queue in choice stack is not empty,
                         // Move to that location
-                        currentLocationName = TopMostBranch.Peek();
+                        currentLocationName = TopMostBranch.Peek().Item1;
                         currentLocationIndex = GetIndexFromNameList(currentLocationName);
+                        float currentPathWeight = TopMostBranch.Peek().Item2;
+                        TotalPathWeight += currentPathWeight;
                         TopMostBranch.Dequeue();
 
                         isBacktracking = false;
                         // | Trying new path, so algorithm is stopped backtracking
-                        CurrentTraversedRoute.Push(currentLocationName);
+                        CurrentTraversedRoute.Push(new Tuple<string,float>(currentLocationName, currentPathWeight));
                         // | Put selected path to route stack
                         visited[currentLocationName] = true;
                         // | Flagging location as visited
@@ -569,7 +573,8 @@ namespace Tubes2_App
                         // | Set mode to backtracking
                         visited[currentLocationName] = false;
                         // | Backtracking, removing old path visited flags
-                        string LastLocation = CurrentTraversedRoute.Peek(); // DEBUG
+                        // string LastLocation = CurrentTraversedRoute.Peek(); // DEBUG
+                        TotalPathWeight -= CurrentTraversedRoute.Peek().Item2;
                         CurrentTraversedRoute.Pop();
                         // | Remove last path from route stack
                     }
@@ -589,11 +594,12 @@ namespace Tubes2_App
             string TargetToCurrent = "";
             while (CurrentTraversedRoute.Count != 0) {
                 // System.Windows.Forms.MessageBox.Show(CurrentTraversedRoute.Peek(), count.ToString()); // DEBUG
-                exploreRoute.Add(CurrentTraversedRoute.Peek());
-                TargetToCurrent = TargetToCurrent + " " + CurrentTraversedRoute.Peek();
+                exploreRoute.Add(CurrentTraversedRoute.Peek().Item1);
+                TargetToCurrent = TargetToCurrent + " " + CurrentTraversedRoute.Peek().Item1;
                 CurrentTraversedRoute.Pop();
             }
             System.Windows.Forms.MessageBox.Show(TargetToCurrent, "Route end to start"); // DEBUG
+            System.Windows.Forms.MessageBox.Show(TotalPathWeight.ToString(), "Route end to start - Weight"); // DEBUG
             exploreRoute.Reverse();
             return isSolutionFound;
         }
