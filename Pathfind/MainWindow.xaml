@@ -23,7 +23,7 @@
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="20"/>
                     <RowDefinition Height="90"/>
-                    <RowDefinition Height="340"/>
+                    <RowDefinition Height="320"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" HorizontalAlignment="Center" TextWrapping="Wrap" Text="MANGGA" VerticalAlignment="Top" Height="54" Width="162" TextAlignment="Center" FontSize="36" FontWeight="Bold" Margin="0,0,0,0" Style="{StaticResource VigaFont}">
@@ -77,7 +77,8 @@
                     <RowDefinition Height="20"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="50"/>
-                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="340"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0" Margin="0,0,0,0">
@@ -96,6 +97,9 @@
                 <Button Grid.Row="4" Content="Search" HorizontalAlignment="Center" Height="25" Margin="291,5.2,294.4,0" VerticalAlignment="Top" Width="61" Click="Search_Click" Background="#FFF67280" Foreground="White" BorderBrush="{x:Null}" Opacity="0.8" Style="{StaticResource VigaFont}"/>
                 <Grid Grid.Row="6" Name="resultGraphCanvas">
                     
+                </Grid>
+                <Grid Grid.Row="7" Name="resultDescriptionCanvas">
+
                 </Grid>
             </Grid>
         </Grid>

@@ -85,6 +85,46 @@ namespace Tubes2_App
                 myImage3.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
                 myImage3.VerticalAlignment = System.Windows.VerticalAlignment.Top;
                 resultGraphCanvas.Children.Add(myImage3);
+
+                resultDescriptionCanvas.Children.Clear();
+                TextBlock resultTextBlock = new TextBlock();
+                resultTextBlock.TextAlignment = TextAlignment.Center;
+                Run text_result;
+                text_result = new Run("\nResult\n");
+                var bc = new BrushConverter();
+                text_result.Foreground = (System.Windows.Media.Brush)bc.ConvertFrom("#FFFFE5B4");
+                text_result.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
+                text_result.FontSize = 18;
+                resultTextBlock.Inlines.Add(text_result);
+
+                int i = 0;
+                foreach (string node in exploreRoute)
+                {
+                    string alpha = char.ConvertFromUtf32(65 + i).ToString();
+                    Run text2_result;
+                    if (i != exploreRoute.Count - 1)
+                    {
+                        text2_result = new Run(node + " - " );
+                    }
+                    else
+                    {
+                        text2_result = new Run(node);
+                    }
+                    text2_result.Foreground = (System.Windows.Media.Brush)bc.ConvertFrom("#FFCBA5");
+                    text2_result.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
+                    text2_result.FontSize = 14;
+                    resultTextBlock.Inlines.Add(text2_result);
+                    i++;
+                }
+
+                Run text3_result;
+                text3_result = new Run("\nTotal distance : " + TotalPathWeight.ToString());
+                text3_result.Foreground = (System.Windows.Media.Brush)bc.ConvertFrom("#FFFFE5B4");
+                text3_result.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
+                text3_result.FontSize = 18;
+                resultTextBlock.Inlines.Add(text3_result);
+
+                resultDescriptionCanvas.Children.Add(resultTextBlock);
             }
         }
 
@@ -392,8 +432,8 @@ namespace Tubes2_App
                             bool routeSibling = (exploreRoute.IndexOf(dest) - exploreRoute.IndexOf(source) == 1 || exploreRoute.IndexOf(dest) - exploreRoute.IndexOf(source) == -1);
                             if (exploreRoute.Contains(source) && exploreRoute.Contains(dest) && routeSibling)
                             {
-                                edge.Label.FontColor = Microsoft.Msagl.Drawing.Color.MediumVioletRed;
-                                edge.Attr.Color = Microsoft.Msagl.Drawing.Color.Red;
+                                edge.Label.FontColor = Microsoft.Msagl.Drawing.Color.Red;
+                                edge.Attr.Color = Microsoft.Msagl.Drawing.Color.MediumVioletRed;
                                 visitedRoute.Add(source);
                             }
                             else
