@@ -1,0 +1,8 @@
+Alun_Alun -1 721.11 -1 492.00 692.44 1780 -1 -1
+Bank_Mandiri_Asia_Afrika 721.11 -1 162.53 -1 -1 -1 688.07 -1
+Wings_o_wings -1 162.53 -1 429.96 -1 -1 514.46 -1
+Taman_Braga 492.00 -1 429.96 -1 742.20 1810 -1 -1
+Hotel_Pasar_Baru 692.44 -1 -1 742.20 -1 1810 1780 -1
+Terminal_Tegallega 1780 -1 -1 -1 1810 -1 -1 -1 -1
+Perempatan_Jl_Sunda -1 688.07 514.46 -1 1780 -1 -1 512.15
+Perempatan_Jl_Jawa -1 -1 -1 -1 -1 -1 512.15 -1
