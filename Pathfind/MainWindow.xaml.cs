@@ -16,13 +16,15 @@ namespace Tubes2_App
     {
         // Attributes
         string[] lines;
-        SortedSet<string> uniqueAccounts = new SortedSet<string>();
+        HashSet<string> uniqueAccounts = new HashSet<string>();
+        HashSet<string> visitedRoute = new HashSet<string>();
         Bitmap graphBitmap;
         string currentAccount;
         string currentTargetFriend;
         int lastIndexCurrentAccount;
         int lastIndexCurrentTargetFriend;
         List<string> exploreRoute;
+        List<string> coloredRoute;
         TextBlock friendsTextBlock;
         TextBlock exploreTextBlock;
         bool DFSSolution;
@@ -52,15 +54,37 @@ namespace Tubes2_App
             bool isExplorable;
 
             // Membersihkan canvas dan textBlock
-            exploreCanvas.Children.Clear();
-            exploreGraph.Children.Clear();
+            resultGraphCanvas.Children.Clear();
             exploreTextBlock.Inlines.Clear();
             exploreTextBlock.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
             exploreTextBlock.VerticalAlignment = VerticalAlignment.Top;
             exploreTextBlock.TextAlignment = TextAlignment.Center;
 
             isExplorable = PathfindAStar(); // DEBUG
+            if(isExplorable)
+            {
+                // Menggambar Explore Graph
+                searchingCount++;
+                MakeGraph(currentFilename + "-" + searchingCount.ToString(), true);
+                System.Windows.Controls.Image myImage3 = new System.Windows.Controls.Image();
+                myImage3.Source = null;
 
+                // Setting Directory
+                string path = Environment.CurrentDirectory;
+                BitmapImage bi3 = new BitmapImage();
+                bi3.BeginInit();
+                bi3.UriSource = new Uri(@path + ("/explore-" + currentFilename + "-" + searchingCount.ToString() + ".png"), UriKind.Absolute); // TODO : Fix
+                bi3.EndInit();
+
+                // Setting Image Attributes
+                myImage3.Stretch = Stretch.None;
+                myImage3.Source = bi3;
+                myImage3.Width = 200;
+                myImage3.Height = 500;
+                myImage3.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+                myImage3.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                resultGraphCanvas.Children.Add(myImage3);
+            }
         }
 
         private void Browse_File_Button(object sender, RoutedEventArgs e)
@@ -74,10 +98,8 @@ namespace Tubes2_App
             if (fileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 // Clearing and Refreshing variables
-                friendCanvas.Children.Clear();
-                exploreCanvas.Children.Clear();
+                resultGraphCanvas.Children.Clear();
                 graphCanvas.Children.Clear();
-                exploreGraph.Children.Clear();
                 uniqueAccounts.Clear();
                 selectedRadio = "";
                 currentAccount = null;
@@ -118,6 +140,7 @@ namespace Tubes2_App
                 myImage3.VerticalAlignment = System.Windows.VerticalAlignment.Top;
                 graphCanvas.Children.Add(myImage3);
 
+                legendCanvas.Children.Clear();
                 TextBlock legendTextBlock = new TextBlock();
                 legendTextBlock.TextAlignment = TextAlignment.Center;
                 Run text;
@@ -128,11 +151,18 @@ namespace Tubes2_App
                 text.FontSize = 18;
                 legendTextBlock.Inlines.Add(text);
 
-                Run text2 = new Run("\nA : Jakarta");
-                text2.Foreground = (System.Windows.Media.Brush)bc.ConvertFrom("#F8B195");
-                text2.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
-                text2.FontSize = 14;
-                legendTextBlock.Inlines.Add(text2);
+                int i = 0;
+                foreach (string account in uniqueAccounts)
+                {
+                    string alpha = char.ConvertFromUtf32(65 + i).ToString();
+                    Run text2 = new Run("\n" + alpha + " : " + account);
+                    text2.Foreground = (System.Windows.Media.Brush)bc.ConvertFrom("#F8B195");
+                    text2.Style = System.Windows.Application.Current.TryFindResource("VigaFont") as System.Windows.Style;
+                    text2.FontSize = 14;
+                    legendTextBlock.Inlines.Add(text2);
+                    i++;
+                }
+                
                 legendCanvas.Children.Add(legendTextBlock);
 
                 // handler untuk event ChangeComboBox
@@ -188,19 +218,34 @@ namespace Tubes2_App
                     // bool isLoneNode = true;
                     for (int j = 0; j < lines.Length; j++)
                     {
+                        int currentLength;
                         string source = nameList[i];
-                        graph.AddNode(source);
-                        uniqueAccounts.Add(source);
-                        Node src = graph.FindNode(source);
-                        src.Attr.Shape = Shape.Circle;
-                        src.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
-                        src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+                        
 
-                        if (i > j && adjacencyMatrix[i,j] >= 0)
+                        //string alphaSource = (uniqueAccounts.ToList().IndexOf(source) + 1).ToString();
+                        currentLength = uniqueAccounts.Count;
+                        uniqueAccounts.Add(source);
+                        string alphaSource = char.ConvertFromUtf32(65 + uniqueAccounts.ToList().IndexOf(source)).ToString();
+                        if (uniqueAccounts.Count > currentLength)
                         {
+                            graph.AddNode(alphaSource);
+                            Node src = graph.FindNode(alphaSource);
+                            src.Attr.Shape = Shape.Circle;
+                            src.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
+                            src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+                        }
+
+                        if (i > j && adjacencyMatrix[i, j] >= 0)
+                        {
+
                             string dest = nameList[j];
+                            // Menambah akun unik ke uniqueAccounts
+                            uniqueAccounts.Add(dest);
+
+                            string alphaDest = char.ConvertFromUtf32(65 + uniqueAccounts.ToList().IndexOf(dest)).ToString();
+                            //string alphaDest = (uniqueAccounts.ToList().IndexOf(dest) + 1).ToString();
                             // Styling Graph
-                            var edge = graph.AddEdge(source, " " + adjacencyMatrix[i, j].ToString() + " ", dest);
+                            var edge = graph.AddEdge(alphaSource, " " + adjacencyMatrix[i, j].ToString() + " ", alphaDest);
                             edge.Attr.ArrowheadAtSource = ArrowStyle.None;
                             edge.Attr.ArrowheadAtTarget = ArrowStyle.None;
                             edge.Label.FontColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
@@ -210,19 +255,17 @@ namespace Tubes2_App
                             //edge.Label = new Microsoft.Msagl.Drawing.Label(adjacencyMatrix[i, j].ToString());
                             //edge.LabelText = "Halo";
                             // TODO : Edge length ?
-                            edge.Attr.Weight = (int) adjacencyMatrix[i,j];
+                            edge.Attr.Weight = (int)adjacencyMatrix[i, j];
                             // edge.Attr.Weight = 1;
 
-                            Node target = graph.FindNode(dest);
+                            Node target = graph.FindNode(alphaDest);
                             target.Attr.Shape = Shape.Circle;
                             target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
                             target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
                             target.Attr.Padding = 20;
 
 
-                            // Menambah akun unik ke uniqueAccounts
-                            uniqueAccounts.Add(source);
-                            uniqueAccounts.Add(dest);
+                            
                         }
                     }
                 }
@@ -267,74 +310,124 @@ namespace Tubes2_App
             }
             else
             {
-                // Create Graph Content
-                for (int i = 1; i < lines.Length; i++)
+                visitedRoute.Clear();
+                foreach (string rut in exploreRoute)
                 {
-                    string[] splitLine = lines[i].ToString().Split(' ');
-                    string source = splitLine[0];
-                    string dest = splitLine[1];
+                    System.Windows.Forms.MessageBox.Show(rut, "Route end to start");
+                }
+                coloredRoute = new List<string>();
+                // Create Graph Content
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    string source = nameList[i];
 
-                    // Styling Graph
-                    var edge = graph.AddEdge(source, dest);
-                    edge.Attr.ArrowheadAtSource = ArrowStyle.None;
-                    edge.Attr.ArrowheadAtTarget = ArrowStyle.None;
-                    Node src = graph.FindNode(source);
-                    Node target = graph.FindNode(dest);
+                    //string alphaSource = (uniqueAccounts.ToList().IndexOf(source) + 1).ToString();
+                    uniqueAccounts.Add(source);
+                    string alphaSource = char.ConvertFromUtf32(65 + uniqueAccounts.ToList().IndexOf(source)).ToString();
+                    graph.AddNode(alphaSource);
+                    Node src = graph.FindNode(alphaSource);
                     src.Attr.Shape = Shape.Circle;
-                    target.Attr.Shape = Shape.Circle;
+                    src.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
+                    src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
 
                     if (exploreRoute.Contains(source))
                     {
                         src.Attr.FillColor = Microsoft.Msagl.Drawing.Color.LightPink;
                         src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+                        coloredRoute.Add(source);
                     }
-                    else
+                    else if (!coloredRoute.Contains(source))
                     {
                         src.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
                         src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
                     }
+                    // bool isLoneNode = true;
+                    for (int j = 0; j < lines.Length; j++)
+                    {
 
-                    if (exploreRoute.Contains(dest))
-                    {
-                        target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.LightPink;
-                        target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
-                    }
-                    else
-                    {
-                        target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
-                        target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
-                    }
 
-                    if (exploreRoute.Contains(source) && exploreRoute.Contains(dest))
-                    {
-                        edge.Attr.Color = Microsoft.Msagl.Drawing.Color.Red;
-                    }
-                    else
-                    {
-                        edge.Attr.Color = Microsoft.Msagl.Drawing.Color.LightPink;
+                        if (i > j && adjacencyMatrix[i, j] >= 0)
+                        {
+
+                            string dest = nameList[j];
+                            // Menambah akun unik ke uniqueAccounts
+                            uniqueAccounts.Add(dest);
+
+                            string alphaDest = char.ConvertFromUtf32(65 + uniqueAccounts.ToList().IndexOf(dest)).ToString();
+                            //string alphaDest = (uniqueAccounts.ToList().IndexOf(dest) + 1).ToString();
+                            // Styling Graph
+                            var edge = graph.AddEdge(alphaSource, " " + adjacencyMatrix[i, j].ToString() + " ", alphaDest);
+                            edge.Attr.ArrowheadAtSource = ArrowStyle.None;
+                            edge.Attr.ArrowheadAtTarget = ArrowStyle.None;
+                            edge.Label.FontColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
+                            edge.Label.FontSize = 5;
+                            edge.Label.Size = new Microsoft.Msagl.Core.DataStructures.Size(60, 60);
+                            edge.Attr.Color = Microsoft.Msagl.Drawing.Color.GhostWhite;
+                            //edge.Label = new Microsoft.Msagl.Drawing.Label(adjacencyMatrix[i, j].ToString());
+                            //edge.LabelText = "Halo";
+                            // TODO : Edge length ?
+                            edge.Attr.Weight = (int)adjacencyMatrix[i, j];
+                            // edge.Attr.Weight = 1;
+
+                            Node target = graph.FindNode(alphaDest);
+                            target.Attr.Shape = Shape.Circle;
+                            target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
+                            target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+                            target.Attr.Padding = 20;
+
+
+                            if (exploreRoute.Contains(dest))
+                            {
+                                target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.LightPink;
+                                target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+                                coloredRoute.Add(dest);
+                            }
+                            else if (!coloredRoute.Contains(dest))
+                            {
+                                target.Attr.FillColor = Microsoft.Msagl.Drawing.Color.PeachPuff;
+                                target.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
+                            }
+
+                            bool routeSibling = (exploreRoute.IndexOf(dest) - exploreRoute.IndexOf(source) == 1 || exploreRoute.IndexOf(dest) - exploreRoute.IndexOf(source) == -1);
+                            if (exploreRoute.Contains(source) && exploreRoute.Contains(dest) && routeSibling)
+                            {
+                                edge.Label.FontColor = Microsoft.Msagl.Drawing.Color.MediumVioletRed;
+                                edge.Attr.Color = Microsoft.Msagl.Drawing.Color.Red;
+                                visitedRoute.Add(source);
+                            }
+                            else
+                            {
+                                edge.Attr.Color = Microsoft.Msagl.Drawing.Color.LightPink;
+                            }
+                            
+                        }
                     }
                 }
+                // System.Windows.Forms.MessageBox.Show(splitLine[j+1]); // DEBUG
+                // System.Windows.Forms.MessageBox.Show("pout"); // DEBUG
+                // System.Windows.Forms.MessageBox.Show("omasd"); // DEBUG
+
 
                 // Create Graph Image
                 Microsoft.Msagl.GraphViewerGdi.GraphRenderer renderer = new Microsoft.Msagl.GraphViewerGdi.GraphRenderer(graph);
                 renderer.CalculateLayout();
                 graph.Attr.BackgroundColor = Microsoft.Msagl.Drawing.Color.Transparent;
-                int height = 350;
-                if (graph.Width > graph.Height && graph.Width * (height / graph.Height) > 300)
+                int height = 360;
+                if (graph.Width > graph.Height && graph.Width > 400)
                 {
                     height = 160;
                 }
                 else if (graph.Width / graph.Height > 1.3)
                 {
-                    height = 75;
+                    height = 150;
                 }
                 else if (graph.Width / graph.Height > 1.5)
                 {
-                    height = 100;
+                    height = 120;
                 }
                 else if (graph.Width * (height / graph.Height) > 500)
                 {
-                    height = 200;
+                    height = 250;
                 }
 
                 graphBitmap = new Bitmap((int)(graph.Width *
@@ -403,6 +496,7 @@ namespace Tubes2_App
         private bool PathfindAStar()
         {
             // Inisiasi variabel
+            exploreRoute = new List<string>();
             Dictionary<string, List<string>> Route = new Dictionary<string, List<string>>(); // TODO : Use ?
             
             Queue<string> MoveQueue = new Queue<string>();
@@ -495,11 +589,12 @@ namespace Tubes2_App
             string TargetToCurrent = "";
             while (CurrentTraversedRoute.Count != 0) {
                 // System.Windows.Forms.MessageBox.Show(CurrentTraversedRoute.Peek(), count.ToString()); // DEBUG
+                exploreRoute.Add(CurrentTraversedRoute.Peek());
                 TargetToCurrent = TargetToCurrent + " " + CurrentTraversedRoute.Peek();
                 CurrentTraversedRoute.Pop();
             }
             System.Windows.Forms.MessageBox.Show(TargetToCurrent, "Route end to start"); // DEBUG
-
+            exploreRoute.Reverse();
             return isSolutionFound;
         }
     }

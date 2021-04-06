@@ -84,30 +84,18 @@
                     <TextBlock HorizontalAlignment="Center" Margin="0,0,0,0" TextWrapping="Wrap" Text="Where Are You?" Width="133" Foreground="#FF6C5B7B" Style="{StaticResource VigaFont}" TextAlignment="Center"/>
                 </Grid>
                 <Grid Grid.Row="1" Margin="0,0,0,0">
-                    <ComboBox HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" VerticalAlignment="Top" Width="76" Name="Choose_Account_ComboBox" SelectionChanged="Choose_Account_ComboBox_SelectionChanged" RenderTransformOrigin="0.808,0.57"/>
+                    <ComboBox HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" VerticalAlignment="Top" Width="120" Name="Choose_Account_ComboBox" SelectionChanged="Choose_Account_ComboBox_SelectionChanged" RenderTransformOrigin="0.808,0.57"/>
                 </Grid>
                 <Grid Grid.Row="2" Margin="0,0,0,0">
                     <TextBlock HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" TextWrapping="Wrap" Text="Where To Go?" VerticalAlignment="Top" Width="133" Foreground="#FF6C5B7B" Style="{StaticResource VigaFont}" TextAlignment="Center"/>
                 </Grid>
                 <Grid Grid.Row="3" Margin="0,0,0,0">
-                    <ComboBox HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" VerticalAlignment="Top" Width="76" Name="Explore_ComboBox" SelectionChanged="Explore_ComboBox_SelectionChanged"/>
+                    <ComboBox HorizontalAlignment="Center" Height="20" Margin="0,0,0,0" VerticalAlignment="Top" Width="120" Name="Explore_ComboBox" SelectionChanged="Explore_ComboBox_SelectionChanged"/>
                 </Grid>
                 <Grid Grid.Row="4" Margin="0,10,0,0"/>
                 <Button Grid.Row="4" Content="Search" HorizontalAlignment="Center" Height="25" Margin="291,5.2,294.4,0" VerticalAlignment="Top" Width="61" Click="Search_Click" Background="#FFF67280" Foreground="White" BorderBrush="{x:Null}" Opacity="0.8" Style="{StaticResource VigaFont}"/>
-                <Grid Grid.Row="6">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid HorizontalAlignment="Center" Grid.Column="0" Height="450" Margin="0,0,0,0" VerticalAlignment="Top" Width="312" Name="friendCanvas"/>
-                    <Grid Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="150"/>
-                            <RowDefinition Height="400"/>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Top" Width="312" Name="exploreCanvas"/>
-                        <Grid Grid.Row="1" HorizontalAlignment="Center" Height="400" Margin="0,0,0,0" VerticalAlignment="Top" Width="312" Name="exploreGraph"/>
-                    </Grid>
+                <Grid Grid.Row="6" Name="resultGraphCanvas">
+                    
                 </Grid>
             </Grid>
         </Grid>
