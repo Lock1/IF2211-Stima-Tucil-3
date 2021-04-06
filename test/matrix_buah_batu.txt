@@ -6,3 +6,11 @@ Gudang_Garam 179.66 -1 -1 -1 -1 -1 -1 -1
 Edelweiss_Hospital -1 -1 459.26 -1 -1 -1 501.05 505.03
 Alfamart -1 -1 -1 -1 -1 501.05 -1 375.96
 KPU_Bandung -1 -1 -1 -1 -1 505.03 375.96 -1
+Pizza_Hut_Buahbatu -6.94010 107.65981
+RSAI_Buahbatu -6.93897 107.66913
+Mandiri_University -6.94214 107.65392
+Metro_Indah_Mall -6.94214 107.65874
+Gudang_Garam -6.93881 107.66059
+Edelweiss_Hospital -6.94351 107.64964
+Alfamart -6.94398 107.64856
+KPU_Bandung -6.94437 107.64569

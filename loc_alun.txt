@@ -1,8 +1,0 @@
-Alun_Alun -6.92118 107.60714
-Bank_Mandiri_Asia_Afrika -6.92175 107.61348
-Wings_o_wings -6.92062 107.61393
-Taman_Braga -6.91976 107.60998
-Hotel_Pasar_Baru -6.91757 107.60445
-Terminal_Tegallega -6.93382 107.60287
-Perempatan_Jl_Sunda -6.92237 107.61756
-Perempatan_Jl_Jawa -6.91592 107.61839

@@ -34,9 +34,11 @@ namespace Tubes2_App
         int searchingCount;
         float TotalPathWeight;
 
+        int countLines;
         Dictionary<string, List<string>> adjacencyList;
         float[,] adjacencyMatrix;
         string[] nameList;
+        Tuple<float,float>[] positionLocation;
 
         // Constructor
         public MainWindow()
@@ -61,7 +63,7 @@ namespace Tubes2_App
             exploreTextBlock.VerticalAlignment = VerticalAlignment.Top;
             exploreTextBlock.TextAlignment = TextAlignment.Center;
 
-            isExplorable = PathfindAStar(); // DEBUG
+            isExplorable = PathfindAStar();
             if(isExplorable)
             {
                 // Menggambar Explore Graph
@@ -213,9 +215,11 @@ namespace Tubes2_App
 
         private void generateAdjacencyList()
         {
-            int countLines = lines.Length;
+            countLines = (int) lines.Length/2;
+
             adjacencyList = new Dictionary<string, List<string>>();
             adjacencyMatrix = new float[countLines,countLines];
+            positionLocation = new Tuple<float,float>[countLines];
             nameList = new string[countLines];
 
             // Membaca dan mempersiapkan adjancency list dengan membaca input
@@ -227,6 +231,8 @@ namespace Tubes2_App
                 string locationName = splitLine[0];
                 nameList[i] = locationName;
                 adjacencyList[locationName] = new List<string>();
+                string[] splitLocationLine = lines[countLines+i].ToString().Split(' ');
+                positionLocation[i] = new Tuple<float,float>(float.Parse(splitLocationLine[1]), float.Parse(splitLocationLine[2]));
             }
 
             for (int i=0;i<countLines;i++)
@@ -254,10 +260,10 @@ namespace Tubes2_App
             if (!isExploreGraph)
             {
                 // Create Graph Content
-                for (int i = 0; i < lines.Length; i++)
+                for (int i = 0; i < countLines; i++)
                 {
                     // bool isLoneNode = true;
-                    for (int j = 0; j < lines.Length; j++)
+                    for (int j = 0; j < countLines; j++)
                     {
                         int currentLength;
                         string source = nameList[i];
@@ -352,13 +358,9 @@ namespace Tubes2_App
             else
             {
                 visitedRoute.Clear();
-                foreach (string rut in exploreRoute)
-                {
-                    System.Windows.Forms.MessageBox.Show(rut, "Route end to start");
-                }
                 coloredRoute = new List<string>();
                 // Create Graph Content
-                for (int i = 0; i < lines.Length; i++)
+                for (int i = 0; i < countLines; i++)
                 {
                     string source = nameList[i];
 
@@ -383,7 +385,7 @@ namespace Tubes2_App
                         src.Attr.Color = Microsoft.Msagl.Drawing.Color.Purple;
                     }
                     // bool isLoneNode = true;
-                    for (int j = 0; j < lines.Length; j++)
+                    for (int j = 0; j < countLines; j++)
                     {
 
 
@@ -406,7 +408,6 @@ namespace Tubes2_App
                             edge.Attr.Color = Microsoft.Msagl.Drawing.Color.GhostWhite;
                             //edge.Label = new Microsoft.Msagl.Drawing.Label(adjacencyMatrix[i, j].ToString());
                             //edge.LabelText = "Halo";
-                            // TODO : Edge length ?
                             edge.Attr.Weight = (int)adjacencyMatrix[i, j];
                             // edge.Attr.Weight = 1;
 
@@ -444,9 +445,6 @@ namespace Tubes2_App
                         }
                     }
                 }
-                // System.Windows.Forms.MessageBox.Show(splitLine[j+1]); // DEBUG
-                // System.Windows.Forms.MessageBox.Show("pout"); // DEBUG
-                // System.Windows.Forms.MessageBox.Show("omasd"); // DEBUG
 
 
                 // Create Graph Image
@@ -534,6 +532,16 @@ namespace Tubes2_App
             return -1;
         }
 
+        private float GetStraightDistance(string pos1, string pos2) {
+            int index1 = GetIndexFromNameList(pos1);
+            int index2 = GetIndexFromNameList(pos2);
+
+            float PositionDeltaX = positionLocation[index1].Item1 - positionLocation[index2].Item1;
+            float PositionDeltaY = positionLocation[index1].Item2 - positionLocation[index2].Item2;
+
+            return (float) Math.Sqrt(PositionDeltaX*PositionDeltaX + PositionDeltaX*PositionDeltaX);
+        }
+
         private bool PathfindAStar()
         {
             // Inisiasi variabel
@@ -561,25 +569,24 @@ namespace Tubes2_App
 
             // Pathfinding
             while (currentLocationName != currentTargetFriend) {
-                // System.Windows.Forms.MessageBox.Show(currentLocationName, "Current Location"); // DEBUG
 
                 // Creating branch only if not backtracking
                 // Get sorted distance and put to choice stack
                 if (!isBacktracking) {
-                    // List carrying tuple of target location name and distance
-                    List<Tuple<string,float>> distanceList = new List<Tuple<string,float>>();
+                    // List carrying tuple of target location name, distance to, and heuristic value
+                    List<Tuple<string,float,float>> distanceList = new List<Tuple<string,float,float>>();
                     for (int i = 0; i < nameList.Length; i++) {
                         if (currentLocationIndex != i && !visited[nameList[i]] && adjacencyMatrix[currentLocationIndex,i] >= 0)
-                            distanceList.Add(new Tuple<string, float> (nameList[i], adjacencyMatrix[currentLocationIndex,i]));
+                            distanceList.Add(new Tuple<string, float, float> (nameList[i], adjacencyMatrix[currentLocationIndex,i],
+                                    GetStraightDistance(currentTargetFriend, nameList[i])));
                     }
-
                     // Sorting list with Linq, ascending order
-                    List<Tuple<string,float>> sortedDistance = distanceList.OrderBy(obj=>obj.Item2).ToList();
+                    List<Tuple<string,float,float>> sortedDistance = distanceList.OrderBy(obj=>obj.Item3).ToList();
 
                     // Creating available path queue from sorted list
                     Queue<Tuple<string,float>> AvailableBranch = new Queue<Tuple<string,float>>();
                     foreach (var entry in sortedDistance) {
-                        AvailableBranch.Enqueue(entry);
+                        AvailableBranch.Enqueue(new Tuple<string,float>(entry.Item1, entry.Item2));
                     }
 
                     // Push available path queue to choice stack
@@ -621,25 +628,19 @@ namespace Tubes2_App
                 }
                 else {
                     // If choice stack is exhausted, then no path found
-                    System.Windows.Forms.MessageBox.Show("path not found"); // DEBUG
-                    // TODO : Do something if no path found
+                    System.Windows.Forms.MessageBox.Show("Path not found", "Alert");
                     isSolutionFound = false;
                     break;
                 }
 
             }
 
-            // DEBUG
+
             // Reversed path printing
-            string TargetToCurrent = "";
             while (CurrentTraversedRoute.Count != 0) {
-                // System.Windows.Forms.MessageBox.Show(CurrentTraversedRoute.Peek(), count.ToString()); // DEBUG
                 exploreRoute.Add(CurrentTraversedRoute.Peek().Item1);
-                TargetToCurrent = TargetToCurrent + " " + CurrentTraversedRoute.Peek().Item1;
                 CurrentTraversedRoute.Pop();
             }
-            System.Windows.Forms.MessageBox.Show(TargetToCurrent, "Route end to start"); // DEBUG
-            System.Windows.Forms.MessageBox.Show(TotalPathWeight.ToString(), "Route end to start - Weight"); // DEBUG
             exploreRoute.Reverse();
             return isSolutionFound;
         }
