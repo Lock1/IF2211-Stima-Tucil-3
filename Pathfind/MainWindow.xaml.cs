@@ -233,7 +233,6 @@ namespace Tubes2_App
                 adjacencyList[locationName] = new List<string>();
                 string[] splitLocationLine = lines[countLines+i].ToString().Split(' ');
                 positionLocation[i] = new Tuple<double,double>(double.Parse(splitLocationLine[1], System.Globalization.CultureInfo.InvariantCulture), double.Parse(splitLocationLine[2], System.Globalization.CultureInfo.InvariantCulture));
-                System.Windows.Forms.MessageBox.Show(double.Parse(splitLocationLine[2]).ToString(), "My App");
             }
 
             for (int i=0;i<countLines;i++)
