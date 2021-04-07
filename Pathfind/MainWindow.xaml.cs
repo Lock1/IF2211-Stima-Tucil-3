@@ -32,13 +32,13 @@ namespace Tubes2_App
         string currentFilename;
         int fileOpenCount;
         int searchingCount;
-        float TotalPathWeight;
+        double TotalPathWeight;
 
         int countLines;
         Dictionary<string, List<string>> adjacencyList;
-        float[,] adjacencyMatrix;
+        double[,] adjacencyMatrix;
         string[] nameList;
-        Tuple<float,float>[] positionLocation;
+        Tuple<double,double>[] positionLocation;
 
         // Constructor
         public MainWindow()
@@ -218,8 +218,8 @@ namespace Tubes2_App
             countLines = (int) lines.Length/2;
 
             adjacencyList = new Dictionary<string, List<string>>();
-            adjacencyMatrix = new float[countLines,countLines];
-            positionLocation = new Tuple<float,float>[countLines];
+            adjacencyMatrix = new double[countLines,countLines];
+            positionLocation = new Tuple<double,double>[countLines];
             nameList = new string[countLines];
 
             // Membaca dan mempersiapkan adjancency list dengan membaca input
@@ -232,7 +232,8 @@ namespace Tubes2_App
                 nameList[i] = locationName;
                 adjacencyList[locationName] = new List<string>();
                 string[] splitLocationLine = lines[countLines+i].ToString().Split(' ');
-                positionLocation[i] = new Tuple<float,float>(float.Parse(splitLocationLine[1]), float.Parse(splitLocationLine[2]));
+                positionLocation[i] = new Tuple<double,double>(double.Parse(splitLocationLine[1], System.Globalization.CultureInfo.InvariantCulture), double.Parse(splitLocationLine[2], System.Globalization.CultureInfo.InvariantCulture));
+                System.Windows.Forms.MessageBox.Show(double.Parse(splitLocationLine[2]).ToString(), "My App");
             }
 
             for (int i=0;i<countLines;i++)
@@ -241,7 +242,7 @@ namespace Tubes2_App
                 string source = nameList[i];
                 for (int j=0;j<countLines;j++)
                 {
-                    float edgeWeight = float.Parse(splitLine[j+1]);
+                    double edgeWeight = double.Parse(splitLine[j+1], System.Globalization.CultureInfo.InvariantCulture);
                     adjacencyMatrix[i,j] = edgeWeight;
                     if (edgeWeight >= 0) {
                         string dest = nameList[j];
@@ -532,14 +533,14 @@ namespace Tubes2_App
             return -1;
         }
 
-        private float GetStraightDistance(string pos1, string pos2) {
+        private double GetStraightDistance(string pos1, string pos2) {
             int index1 = GetIndexFromNameList(pos1);
             int index2 = GetIndexFromNameList(pos2);
 
-            float PositionDeltaX = positionLocation[index1].Item1 - positionLocation[index2].Item1;
-            float PositionDeltaY = positionLocation[index1].Item2 - positionLocation[index2].Item2;
+            double PositionDeltaX = positionLocation[index1].Item1 - positionLocation[index2].Item1;
+            double PositionDeltaY = positionLocation[index1].Item2 - positionLocation[index2].Item2;
 
-            return (float) Math.Sqrt(PositionDeltaX*PositionDeltaX + PositionDeltaX*PositionDeltaX);
+            return (double) Math.Sqrt(PositionDeltaX*PositionDeltaX + PositionDeltaX*PositionDeltaX);
         }
 
         private bool PathfindAStar()
@@ -549,8 +550,8 @@ namespace Tubes2_App
             Dictionary<string, List<string>> Route = new Dictionary<string, List<string>>(); // TODO : Use ?
 
             Queue<string> MoveQueue = new Queue<string>();
-            Stack<Queue<Tuple<string,float>>> ChoiceStack = new Stack<Queue<Tuple<string,float>>>();
-            Stack<Tuple<string,float>> CurrentTraversedRoute = new Stack<Tuple<string,float>>();
+            Stack<Queue<Tuple<string,double>>> ChoiceStack = new Stack<Queue<Tuple<string,double>>>();
+            Stack<Tuple<string,double>> CurrentTraversedRoute = new Stack<Tuple<string,double>>();
             Dictionary<string, bool> visited = new Dictionary<string, bool>();
             int currentLocationIndex = GetIndexFromNameList(currentAccount);
             string currentLocationName = currentAccount;
@@ -564,7 +565,7 @@ namespace Tubes2_App
             }
 
             visited[currentLocationName] = true;
-            CurrentTraversedRoute.Push(new Tuple<string,float>(currentLocationName,0));
+            CurrentTraversedRoute.Push(new Tuple<string,double>(currentLocationName,0));
             TotalPathWeight = 0;
 
             // Pathfinding
@@ -574,19 +575,19 @@ namespace Tubes2_App
                 // Get sorted distance and put to choice stack
                 if (!isBacktracking) {
                     // List carrying tuple of target location name, distance to, and heuristic value
-                    List<Tuple<string,float,float>> distanceList = new List<Tuple<string,float,float>>();
+                    List<Tuple<string,double,double>> distanceList = new List<Tuple<string,double,double>>();
                     for (int i = 0; i < nameList.Length; i++) {
                         if (currentLocationIndex != i && !visited[nameList[i]] && adjacencyMatrix[currentLocationIndex,i] >= 0)
-                            distanceList.Add(new Tuple<string, float, float> (nameList[i], adjacencyMatrix[currentLocationIndex,i],
+                            distanceList.Add(new Tuple<string, double, double> (nameList[i], adjacencyMatrix[currentLocationIndex,i],
                                     GetStraightDistance(currentTargetFriend, nameList[i])));
                     }
                     // Sorting list with Linq, ascending order
-                    List<Tuple<string,float,float>> sortedDistance = distanceList.OrderBy(obj=>obj.Item3).ToList();
+                    List<Tuple<string,double,double>> sortedDistance = distanceList.OrderBy(obj=>obj.Item3).ToList();
 
                     // Creating available path queue from sorted list
-                    Queue<Tuple<string,float>> AvailableBranch = new Queue<Tuple<string,float>>();
+                    Queue<Tuple<string,double>> AvailableBranch = new Queue<Tuple<string,double>>();
                     foreach (var entry in sortedDistance) {
-                        AvailableBranch.Enqueue(new Tuple<string,float>(entry.Item1, entry.Item2));
+                        AvailableBranch.Enqueue(new Tuple<string,double>(entry.Item1, entry.Item2));
                     }
 
                     // Push available path queue to choice stack
@@ -596,19 +597,19 @@ namespace Tubes2_App
                 // Move taking
                 if (ChoiceStack.Count != 0) {
                     // If choice stack is not exhausted
-                    Queue<Tuple<string,float>> TopMostBranch = ChoiceStack.Peek();
+                    Queue<Tuple<string,double>> TopMostBranch = ChoiceStack.Peek();
                     if (TopMostBranch.Count != 0) {
                         // If choice queue in choice stack is not empty,
                         // Move to that location
                         currentLocationName = TopMostBranch.Peek().Item1;
                         currentLocationIndex = GetIndexFromNameList(currentLocationName);
-                        float currentPathWeight = TopMostBranch.Peek().Item2;
+                        double currentPathWeight = TopMostBranch.Peek().Item2;
                         TotalPathWeight += currentPathWeight;
                         TopMostBranch.Dequeue();
 
                         isBacktracking = false;
                         // | Trying new path, so algorithm is stopped backtracking
-                        CurrentTraversedRoute.Push(new Tuple<string,float>(currentLocationName, currentPathWeight));
+                        CurrentTraversedRoute.Push(new Tuple<string,double>(currentLocationName, currentPathWeight));
                         // | Put selected path to route stack
                         visited[currentLocationName] = true;
                         // | Flagging location as visited
