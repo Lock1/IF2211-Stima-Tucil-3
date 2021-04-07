@@ -184,6 +184,7 @@ namespace Tubes2_App
                 graphCanvas.Children.Add(myImage3);
 
                 legendCanvas.Children.Clear();
+                resultDescriptionCanvas.Children.Clear();
                 TextBlock legendTextBlock = new TextBlock();
                 legendTextBlock.TextAlignment = TextAlignment.Center;
                 Run text;
