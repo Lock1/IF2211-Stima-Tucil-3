@@ -316,9 +316,6 @@ namespace Tubes2_App
                         }
                     }
                 }
-                // System.Windows.Forms.MessageBox.Show(splitLine[j+1]); // DEBUG
-                // System.Windows.Forms.MessageBox.Show("pout"); // DEBUG
-                // System.Windows.Forms.MessageBox.Show("omasd"); // DEBUG
 
 
                 // Create Graph Image
@@ -620,7 +617,6 @@ namespace Tubes2_App
                         // | Set mode to backtracking
                         visited[currentLocationName] = false;
                         // | Backtracking, removing old path visited flags
-                        // string LastLocation = CurrentTraversedRoute.Peek(); // DEBUG
                         TotalPathWeight -= CurrentTraversedRoute.Peek().Item2;
                         CurrentTraversedRoute.Pop();
                         // | Remove last path from route stack
